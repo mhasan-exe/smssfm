@@ -28,11 +28,18 @@ fixture assignments just live in memory and vanish on refresh instead of saving.
 - **Timetables tab**: pick a class, see its whole week. Pick a date to preview
   what that week actually looks like on that day (shows substitutes if a
   fixture is active).
-- **Set Fixture tab**: pick a date + class + period. It shows you the regular
-  teacher, then a dropdown of every teacher who is *not* scheduled anywhere at
-  that same time slot that day, sorted by lowest current weekly units first.
-  Pick how many days the substitution should run — it automatically stops
-  applying itself after that (computed at render time, nothing to manually revert).
+- **Set Fixture tab**: two entry points into the same underlying system:
+  - **Mark teacher absent** (default view): pick the teacher, first absent
+    date, and how many days they're out. AKESP pulls every period that
+    teacher normally teaches within that window — any class, any grade — and
+    lists them one by one with a "who's free right now, lightest load first"
+    dropdown next to each. Assign as you go; a progress line shows
+    "x / y periods covered."
+  - **Cover one period**: the direct single-period flow — pick date, class,
+    and period yourself if you already know exactly what needs covering.
+  Both write to the same fixture records, so a period assigned one way shows
+  up correctly no matter which view you check it from. Each substitution
+  auto-expires on its own after the date it covers — nothing to manually revert.
 - **Weekly Units tab**: every teacher's default load (from their real
   timetable) + fixture periods picked up so far this week. You can change
   which day/time the week "resets" on — this shifts what counts as

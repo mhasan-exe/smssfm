@@ -48,10 +48,35 @@
   <section class="panel hidden" id="tab-fixture">
     <div class="panel-head">
       <h1>Set a Fixture</h1>
-      <p class="hint">Pick the date and the period that needs covering. AKESP will show you who's free right then, sorted by who's carrying the lightest load this week.</p>
+      <p class="hint">Two ways in: cover one specific period yourself, or mark a teacher absent and let AKESP surface every period of theirs that needs covering until the due date.</p>
     </div>
 
-    <div class="fixture-form">
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="absent">MARK TEACHER ABSENT (all periods)</button>
+      <button class="mode-btn" data-mode="single">COVER ONE PERIOD</button>
+    </div>
+
+    <!-- ---- Mode: mark teacher absent, auto-list every affected period ---- -->
+    <div class="fixture-form" id="mode-absent">
+      <label class="field">
+        <span>Absent teacher</span>
+        <select id="absTeacher"></select>
+      </label>
+      <label class="field">
+        <span>First absent date</span>
+        <input type="date" id="absDate">
+      </label>
+      <label class="field">
+        <span>Number of days out (due date shown below)</span>
+        <input type="number" id="absDays" min="1" value="1">
+      </label>
+      <div class="original-box" id="absDueBox">Pick a teacher and dates to see the due date.</div>
+      <button class="btn-lime" id="absGenerateBtn">SHOW PERIODS NEEDING COVER</button>
+    </div>
+    <div id="absenceBoard"></div>
+
+    <!-- ---- Mode: cover a single period manually ---- -->
+    <div class="fixture-form hidden" id="mode-single">
       <label class="field">
         <span>Date</span>
         <input type="date" id="fxDate">

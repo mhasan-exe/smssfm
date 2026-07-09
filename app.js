@@ -197,8 +197,136 @@ function renderTimetable(){
   container.innerHTML = html;
 }
 
+async function saveFixtureDoc(fixture){
+  if (!db) {
+    const doc = { id: 'local-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), ...fixture };
+    fixturesCache.push(doc);
+    return doc;
+  }
+  const ref = await db.collection('fixtures').add(fixture);
+  const doc = { id: ref.id, ...fixture };
+  fixturesCache.push(doc);
+  return doc;
+}
+
+// ---------------------------------------------------------------
+// Absence mode: mark a teacher absent, auto-surface every period
+// of theirs (any class) that falls in the window and needs a sub.
+// ---------------------------------------------------------------
+function computeAbsencePeriods(teacher, startDate, days){
+  const results = [];
+  for (let i=0; i<days; i++){
+    const date = addDays(startDate, i);
+    const weekday = weekdayNameOf(date);
+    if (!SCHOOL_DAYS.includes(weekday)) continue;
+    const sched = SCHOOL_DATA.TEACHER_SCHEDULE[teacher][weekday];
+    for (let s=1; s<=8; s++){
+      const cell = sched[s-1];
+      if (cell && cell.type === 'class') {
+        results.push({ date, weekday, slot: s, class: cell.class, group: cell.group, note: cell.note });
+      }
+    }
+  }
+  return results;
+}
+
+function populateAbsTeacherSelect(){
+  const names = Object.keys(SCHOOL_DATA.TEACHER_SCHEDULE).sort();
+  document.getElementById('absTeacher').innerHTML = names.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderAbsenceBoard(){
+  const teacher = document.getElementById('absTeacher').value;
+  const startDate = document.getElementById('absDate').value || todayStr();
+  const days = Math.max(1, parseInt(document.getElementById('absDays').value, 10) || 1);
+  const endDate = addDays(startDate, days - 1);
+
+  document.getElementById('absDueBox').innerHTML =
+    `<b>${teacher}</b> out ${startDate} → ${endDate} (back on ${addDays(endDate, 1)}).`;
+
+  const periods = computeAbsencePeriods(teacher, startDate, days);
+  const board = document.getElementById('absenceBoard');
+  if (periods.length === 0) {
+    board.innerHTML = '<div class="empty-note">No scheduled periods for this teacher in that window.</div>';
+    return;
+  }
+
+  const byDate = {};
+  periods.forEach(p => { (byDate[p.date] = byDate[p.date] || []).push(p); });
+
+  let coveredCount = 0;
+  let html = '';
+  Object.keys(byDate).sort().forEach(date => {
+    const weekday = weekdayNameOf(date);
+    html += `<div class="absence-day-group"><div class="absence-day-label">${weekday} · ${date}</div>`;
+    byDate[date].sort((a,b) => a.slot - b.slot).forEach(p => {
+      const tmpl = templateOf(p.class, weekday);
+      const tinfo = tmpl[p.slot - 1];
+      const time = (tinfo && tinfo.time) ? tinfo.time : 'time uncertain ⚠';
+      const existingFx = findActiveFixture(p.class, weekday, p.slot, p.group, date);
+      html += `<div class="absence-row" data-date="${date}" data-weekday="${weekday}" data-class="${p.class}" data-slot="${p.slot}" data-group="${p.group||''}" data-original="${teacher}">`;
+      html += `<span class="ar-class">${p.class}</span><span class="ar-time">P${p.slot} · ${time}</span>`;
+      if (existingFx) {
+        coveredCount++;
+        html += `<span class="covered-tag">COVERED by ${existingFx.subTeacher}</span>`;
+        html += `<button class="assign-btn remove-cov" data-id="${existingFx.id}">UNDO</button>`;
+      } else {
+        const free = freeTeachersFor(p.class, weekday, p.slot, date, teacher);
+        if (free.length === 0) {
+          html += `<span class="note-tag">No free teacher found</span>`;
+        } else {
+          html += `<select class="abs-sub-select">${free.map(f => `<option value="${f.teacher}">${f.teacher} — ${f.total}u</option>`).join('')}</select>`;
+          html += `<button class="assign-btn do-assign">ASSIGN</button>`;
+        }
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+
+  board.innerHTML = `<div class="absence-summary">${coveredCount} / ${periods.length} periods covered</div>` + html;
+
+  board.querySelectorAll('button.do-assign').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.absence-row');
+      const select = row.querySelector('.abs-sub-select');
+      const subTeacher = select.value;
+      const date = row.dataset.date, weekday = row.dataset.weekday, cls = row.dataset.class;
+      const slot = parseInt(row.dataset.slot, 10), group = row.dataset.group || null;
+      await saveFixtureDoc({
+        class: cls, weekday, slot, group,
+        originalTeacher: row.dataset.original, subTeacher,
+        startDate: date, days: 1, endDate: date,
+        createdAt: Date.now()
+      });
+      renderAbsenceBoard();
+      renderFixtureList();
+      renderTimetable();
+    });
+  });
+  board.querySelectorAll('button.remove-cov').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await removeFixture(btn.dataset.id);
+      renderAbsenceBoard();
+    });
+  });
+}
+
+function setupModeToggle(){
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mode = btn.dataset.mode;
+      document.getElementById('mode-absent').classList.toggle('hidden', mode !== 'absent');
+      document.getElementById('absenceBoard').classList.toggle('hidden', mode !== 'absent');
+      document.getElementById('mode-single').classList.toggle('hidden', mode !== 'single');
+    });
+  });
+}
+
 // ===================================================================
-// UI: Set Fixture tab
+// UI: Set Fixture tab — single period mode
 // ===================================================================
 function populateFxSlots(){
   const cls = document.getElementById('fxClass').value;
@@ -273,24 +401,13 @@ async function assignFixture(){
   const entry = entries.find(e => e.slot === slot && (e.group||'') === group);
   const endDate = addDays(dateStr, days - 1);
 
-  const fixture = {
-    class: cls, weekday, slot, group: group || null,
-    originalTeacher: entry.teacher, subTeacher,
-    startDate: dateStr, days, endDate,
-    createdAt: Date.now()
-  };
-
-  if (!db) {
-    fixturesCache.push({ id: 'local-'+Date.now(), ...fixture });
-    msg.textContent = 'Saved locally (Firebase not configured yet — fill in firebase-config.js to persist for real).';
-    msg.className = 'fx-msg ok';
-    renderFixtureList(); renderTimetable(); populateFxSlots();
-    return;
-  }
-
   try {
-    const ref = await db.collection('fixtures').add(fixture);
-    fixturesCache.push({ id: ref.id, ...fixture });
+    await saveFixtureDoc({
+      class: cls, weekday, slot, group: group || null,
+      originalTeacher: entry.teacher, subTeacher,
+      startDate: dateStr, days, endDate,
+      createdAt: Date.now()
+    });
     msg.textContent = `Assigned ${subTeacher} to cover ${cls} P${slot} on ${weekday}s, ${dateStr} → ${endDate}.`;
     msg.className = 'fx-msg ok';
     renderFixtureList(); renderTimetable(); populateFxSlots();
@@ -381,14 +498,18 @@ async function boot(){
   document.getElementById('todayChip').textContent = todayStr();
   document.getElementById('viewDate').value = todayStr();
   document.getElementById('fxDate').value = todayStr();
+  document.getElementById('absDate').value = todayStr();
 
   initFirebase();
   await loadSettingsFromFirestore();
   await loadFixturesFromFirestore();
 
   populateClassSelects();
+  populateAbsTeacherSelect();
+  setupModeToggle();
   renderTimetable();
   populateFxSlots();
+  renderAbsenceBoard();
 
   document.getElementById('classSelect').addEventListener('change', renderTimetable);
   document.getElementById('viewDate').addEventListener('change', renderTimetable);
@@ -397,6 +518,11 @@ async function boot(){
   document.getElementById('fxSlot').addEventListener('change', updateFxOriginalAndSubs);
   document.getElementById('fxAssignBtn').addEventListener('click', assignFixture);
   document.getElementById('saveResetBtn').addEventListener('click', saveResetSettings);
+
+  document.getElementById('absGenerateBtn').addEventListener('click', renderAbsenceBoard);
+  document.getElementById('absTeacher').addEventListener('change', renderAbsenceBoard);
+  document.getElementById('absDate').addEventListener('change', renderAbsenceBoard);
+  document.getElementById('absDays').addEventListener('change', renderAbsenceBoard);
 }
 
 boot();
