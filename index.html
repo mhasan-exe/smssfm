@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKESP — Timetable &amp; Fixtures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">AKESP</span>
+    <span class="brand-sub">Timetable &amp; Fixture Board</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="timetables">TIMETABLES</button>
+    <button class="tab-btn" data-tab="fixture">SET FIXTURE</button>
+    <button class="tab-btn" data-tab="units">WEEKLY UNITS</button>
+  </nav>
+  <div class="date-chip" id="todayChip">—</div>
+</header>
+
+<main>
+
+  <!-- ===================== TIMETABLES TAB ===================== -->
+  <section class="panel" id="tab-timetables">
+    <div class="panel-head">
+      <h1>Class Timetable</h1>
+      <div class="control-row">
+        <label class="field">
+          <span>Class</span>
+          <select id="classSelect"></select>
+        </label>
+        <label class="field">
+          <span>Viewing date (for substitutions)</span>
+          <input type="date" id="viewDate">
+        </label>
+      </div>
+    </div>
+    <div id="timetableGrid" class="grid-wrap"></div>
+  </section>
+
+  <!-- ===================== SET FIXTURE TAB ===================== -->
+  <section class="panel hidden" id="tab-fixture">
+    <div class="panel-head">
+      <h1>Set a Fixture</h1>
+      <p class="hint">Pick the date and the period that needs covering. AKESP will show you who's free right then, sorted by who's carrying the lightest load this week.</p>
+    </div>
+
+    <div class="fixture-form">
+      <label class="field">
+        <span>Date</span>
+        <input type="date" id="fxDate">
+      </label>
+      <label class="field">
+        <span>Class</span>
+        <select id="fxClass"></select>
+      </label>
+      <label class="field">
+        <span>Period</span>
+        <select id="fxSlot"></select>
+      </label>
+
+      <div class="original-box" id="fxOriginal">Pick a date, class, and period.</div>
+
+      <label class="field">
+        <span>Covering teacher</span>
+        <select id="fxSub"></select>
+      </label>
+
+      <label class="field">
+        <span>Number of days (auto-reverts after this)</span>
+        <input type="number" id="fxDays" min="1" value="1">
+      </label>
+
+      <button class="btn-lime" id="fxAssignBtn">ASSIGN FIXTURE</button>
+      <div class="fx-msg" id="fxMsg"></div>
+    </div>
+
+    <h2 class="sub-head">Active &amp; Upcoming Fixtures</h2>
+    <div id="fixtureList" class="fixture-list"></div>
+  </section>
+
+  <!-- ===================== WEEKLY UNITS TAB ===================== -->
+  <section class="panel hidden" id="tab-units">
+    <div class="panel-head">
+      <h1>Weekly Units</h1>
+      <p class="hint">Default load (from the master timetable) + any fixture periods picked up this week.</p>
+    </div>
+
+    <div class="settings-box">
+      <span>Week resets every</span>
+      <select id="resetDay">
+        <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+        <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+      </select>
+      <span>at</span>
+      <input type="time" id="resetTime" value="00:00">
+      <button class="btn-lime small" id="saveResetBtn">SAVE</button>
+      <span class="week-window" id="weekWindow"></span>
+    </div>
+
+    <table class="units-table">
+      <thead><tr><th>#</th><th>Teacher</th><th>Default</th><th>Fixture units (this week)</th><th>Total</th></tr></thead>
+      <tbody id="unitsBody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <span>AKESP static board · data baked from Teachers_timetable.xlsx · Firestore only stores fixtures &amp; settings</span>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
