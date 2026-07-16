@@ -23,9 +23,19 @@ function initFirebase(){
     console.warn('firebase-config.js is not filled in yet — running in local-only preview mode.');
     return false;
   }
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-  return true;
+  if (typeof firebase === 'undefined') {
+    console.warn('Firebase SDK failed to load (network/CDN issue) — running in local-only preview mode.');
+    return false;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    return true;
+  } catch (err) {
+    console.warn('Firebase init failed — running in local-only preview mode.', err);
+    db = null;
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------
@@ -694,22 +704,34 @@ async function removeSwitch(switchId){
 // ===================================================================
 async function loadFixturesFromFirestore(){
   if (!db) return;
-  const snap = await db.collection('fixtures').get();
-  fixturesCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  try {
+    const snap = await db.collection('fixtures').get();
+    fixturesCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.warn('Could not load fixtures from Firestore — continuing with an empty local list.', err);
+  }
 }
 async function loadSettingsFromFirestore(){
   if (!db) return;
-  const doc = await db.collection('config').doc('settings').get();
-  if (doc.exists) settingsCache = { ...settingsCache, ...doc.data() };
+  try {
+    const doc = await db.collection('config').doc('settings').get();
+    if (doc.exists) settingsCache = { ...settingsCache, ...doc.data() };
+  } catch (err) {
+    console.warn('Could not load settings from Firestore — using defaults.', err);
+  }
 }
 async function loadRemFromFirestore(){
   if (!db) return;
-  const snap = await db.collection('remStatus').get();
-  remCache = {};
-  snap.docs.forEach(d => {
-    const data = d.data();
-    remCache[remKey({class:data.class, weekday:data.weekday, slot:data.slot})] = { active: data.active, teacher: data.teacher };
-  });
+  try {
+    const snap = await db.collection('remStatus').get();
+    remCache = {};
+    snap.docs.forEach(d => {
+      const data = d.data();
+      remCache[remKey({class:data.class, weekday:data.weekday, slot:data.slot})] = { active: data.active, teacher: data.teacher };
+    });
+  } catch (err) {
+    console.warn('Could not load remedial-slot status from Firestore — starting with all off.', err);
+  }
 }
 
 async function boot(){
@@ -719,10 +741,14 @@ async function boot(){
   document.getElementById('absDate').value = todayStr();
   document.getElementById('swDate').value = todayStr();
 
-  initFirebase();
-  await loadSettingsFromFirestore();
-  await loadFixturesFromFirestore();
-  await loadRemFromFirestore();
+  try {
+    initFirebase();
+    await loadSettingsFromFirestore();
+    await loadFixturesFromFirestore();
+    await loadRemFromFirestore();
+  } catch (err) {
+    console.warn('Firebase setup failed entirely — continuing in local-only mode.', err);
+  }
 
   populateClassSelects();
   populateAbsTeacherSelect();
