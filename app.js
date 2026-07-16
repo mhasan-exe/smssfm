@@ -11,8 +11,9 @@ const WEEKDAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Frida
 const SCHOOL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 
 let db = null;
-let fixturesCache = [];      // all fixture docs {id, class, weekday, slot, group, originalTeacher, subTeacher, startDate, days, endDate}
+let fixturesCache = [];      // all fixture docs {id, class, weekday, slot, group, originalTeacher, subTeacher, startDate, days, endDate, switchId?}
 let settingsCache = { resetDay: 'Monday', resetTime: '00:00' };
+let remCache = {};           // key `${class}|${weekday}|${slot}` -> {active, teacher}
 
 // ---------------------------------------------------------------
 // Firebase init
@@ -66,12 +67,44 @@ function templateOf(cls, weekday){
   return SCHOOL_DATA.PERIOD_TEMPLATES[templateKeyOf(cls, weekday)];
 }
 function classEntriesFor(cls, weekday){
-  return ((SCHOOL_DATA.CLASS_SCHEDULE[cls] || {})[weekday]) || [];
+  const base = ((SCHOOL_DATA.CLASS_SCHEDULE[cls] || {})[weekday]) || [];
+  const rem = (SCHOOL_DATA.PENDING_SLOTS || [])
+    .filter(p => p.class === cls && p.weekday === weekday)
+    .map(p => activeRemEntry(p))
+    .filter(Boolean);
+  return base.concat(rem);
 }
 function teacherSlot(teacher, weekday, slot){
   const sched = SCHOOL_DATA.TEACHER_SCHEDULE[teacher];
-  if (!sched) return null;
-  return sched[weekday][slot-1]; // null | {type:'rem'} | {type:'class',...}
+  const base = sched ? sched[weekday][slot-1] : null; // null | {type:'rem'} | {type:'class',...}
+  if (base) return base;
+  // also busy if actively covering a remedial slot at this weekday/slot
+  const remHit = (SCHOOL_DATA.PENDING_SLOTS || []).find(p => {
+    if (p.weekday !== weekday || p.slot !== slot) return false;
+    const r = remCache[remKey(p)];
+    return r && r.active && r.teacher === teacher;
+  });
+  return remHit ? { type:'class', class: remHit.class, group:null, note:'Remedial' } : null;
+}
+
+// ---------------------------------------------------------------
+// Remedial (REM) slot helpers — pending periods with no teacher
+// hired yet. Off by default; admin flips on + assigns once filled.
+// ---------------------------------------------------------------
+function remKey(p){ return `${p.class}|${p.weekday}|${p.slot}`; }
+function activeRemEntry(p){
+  const r = remCache[remKey(p)];
+  if (!r || !r.active || !r.teacher) return null;
+  return { slot: p.slot, teacher: r.teacher, group: null, note: 'Remedial' };
+}
+function remUnitsFor(teacher){
+  return (SCHOOL_DATA.PENDING_SLOTS || []).filter(p => {
+    const r = remCache[remKey(p)];
+    return r && r.active && r.teacher === teacher;
+  }).length;
+}
+function totalDefaultUnits(teacher){
+  return SCHOOL_DATA.TEACHER_META[teacher].defaultUnits + remUnitsFor(teacher);
 }
 
 // ---------------------------------------------------------------
@@ -108,19 +141,28 @@ function fixtureUnitsThisWeekFor(teacher, weekStart){
 // ---------------------------------------------------------------
 // Free teacher list for a given class/weekday/slot/date
 // ---------------------------------------------------------------
+function teachersOfClass(cls){
+  const set = new Set();
+  for (const wd of SCHOOL_DAYS) {
+    classEntriesFor(cls, wd).forEach(e => set.add(e.teacher));
+  }
+  return set;
+}
+
 function freeTeachersFor(cls, weekday, slot, dateStr, originalTeacher){
   const weekStart = computeWeekStart(settingsCache.resetDay, dateStr);
+  const alreadyTeachesClass = teachersOfClass(cls);
   const list = [];
   for (const teacher of Object.keys(SCHOOL_DATA.TEACHER_SCHEDULE)) {
     if (teacher === originalTeacher) continue;
     const cell = teacherSlot(teacher, weekday, slot);
-    if (cell) continue; // busy with their own class or REM
+    if (cell) continue; // busy with their own class, REM duty, or a covering assignment
     if (teacherHasFixtureAt(teacher, weekday, slot, dateStr)) continue; // already covering elsewhere
-    const defaultUnits = SCHOOL_DATA.TEACHER_META[teacher].defaultUnits;
-    const fxUnits = fixtureUnitsThisWeekFor(teacher, weekStart);
-    list.push({ teacher, total: defaultUnits + fxUnits });
+    const total = totalDefaultUnits(teacher) + fixtureUnitsThisWeekFor(teacher, weekStart);
+    list.push({ teacher, total, teachesClass: alreadyTeachesClass.has(teacher) });
   }
-  list.sort((a,b) => a.total - b.total || a.teacher.localeCompare(b.teacher));
+  // teachers already familiar with this class come first; within each group, lightest load first
+  list.sort((a,b) => (b.teachesClass - a.teachesClass) || (a.total - b.total) || a.teacher.localeCompare(b.teacher));
   return list;
 }
 
@@ -136,6 +178,7 @@ document.getElementById('tabs').addEventListener('click', (e) => {
   document.getElementById(`tab-${btn.dataset.tab}`).classList.remove('hidden');
   if (btn.dataset.tab === 'units') renderUnitsTable();
   if (btn.dataset.tab === 'fixture') renderFixtureList();
+  if (btn.dataset.tab === 'remedial') renderRemedialBoard();
 });
 
 // ===================================================================
@@ -275,7 +318,7 @@ function renderAbsenceBoard(){
         if (free.length === 0) {
           html += `<span class="note-tag">No free teacher found</span>`;
         } else {
-          html += `<select class="abs-sub-select">${free.map(f => `<option value="${f.teacher}">${f.teacher} — ${f.total}u</option>`).join('')}</select>`;
+          html += `<select class="abs-sub-select">${free.map(f => `<option value="${f.teacher}">${f.teachesClass ? '★ ' : ''}${f.teacher} — ${f.total}u</option>`).join('')}</select>`;
           html += `<button class="assign-btn do-assign">ASSIGN</button>`;
         }
       }
@@ -321,6 +364,7 @@ function setupModeToggle(){
       document.getElementById('mode-absent').classList.toggle('hidden', mode !== 'absent');
       document.getElementById('absenceBoard').classList.toggle('hidden', mode !== 'absent');
       document.getElementById('mode-single').classList.toggle('hidden', mode !== 'single');
+      document.getElementById('mode-switch').classList.toggle('hidden', mode !== 'switch');
     });
   });
 }
@@ -381,7 +425,7 @@ function updateFxOriginalAndSubs(){
   if (free.length === 0) {
     subSel.innerHTML = '<option value="">No free teachers found at this time</option>';
   } else {
-    subSel.innerHTML = free.map(f => `<option value="${f.teacher}">${f.teacher} — ${f.total} units this week</option>`).join('');
+    subSel.innerHTML = free.map(f => `<option value="${f.teacher}">${f.teachesClass ? '★ ' : ''}${f.teacher} — ${f.total} units this week</option>`).join('');
   }
 }
 
@@ -435,7 +479,12 @@ function renderFixtureList(){
     container.innerHTML = '<div class="empty-note">No active or upcoming fixtures.</div>';
     return;
   }
-  container.innerHTML = upcoming.map(f => `
+
+  const singles = upcoming.filter(f => !f.switchId);
+  const switchGroups = {};
+  upcoming.filter(f => f.switchId).forEach(f => (switchGroups[f.switchId] = switchGroups[f.switchId] || []).push(f));
+
+  let html = singles.map(f => `
     <div class="fixture-row">
       <span class="fx-class">${f.class}</span>
       <span>P${f.slot} · ${f.weekday}${f.group ? ' · '+f.group+' group' : ''}</span>
@@ -444,8 +493,22 @@ function renderFixtureList(){
       <button data-id="${f.id}">REMOVE</button>
     </div>
   `).join('');
+
+  html += Object.entries(switchGroups).map(([switchId, pair]) => `
+    <div class="fixture-row">
+      <span class="fx-class">SWITCH</span>
+      <span>${pair.map(f => `${f.class} P${f.slot} (${f.weekday}): ${f.originalTeacher} → ${f.subTeacher}`).join(' &nbsp;|&nbsp; ')}</span>
+      <span class="fx-range">${pair[0].startDate} → ${pair[0].endDate}</span>
+      <button data-switch-id="${switchId}">UNDO SWITCH</button>
+    </div>
+  `).join('');
+
+  container.innerHTML = html;
   container.querySelectorAll('button[data-id]').forEach(b => {
     b.addEventListener('click', () => removeFixture(b.dataset.id));
+  });
+  container.querySelectorAll('button[data-switch-id]').forEach(b => {
+    b.addEventListener('click', () => removeSwitch(b.dataset.switchId));
   });
 }
 
@@ -461,12 +524,13 @@ function renderUnitsTable(){
 
   const rows = Object.keys(SCHOOL_DATA.TEACHER_META).map(t => {
     const def = SCHOOL_DATA.TEACHER_META[t].defaultUnits;
+    const rem = remUnitsFor(t);
     const fx = fixtureUnitsThisWeekFor(t, weekStart);
-    return { teacher: t, def, fx, total: def + fx };
+    return { teacher: t, def, rem, fx, total: def + rem + fx };
   }).sort((a,b) => b.total - a.total);
 
   document.getElementById('unitsBody').innerHTML = rows.map((r,i) => `
-    <tr><td>${i+1}</td><td>${r.teacher}</td><td>${r.def}</td><td>${r.fx}</td><td class="total">${r.total}</td></tr>
+    <tr><td>${i+1}</td><td>${r.teacher}</td><td>${r.def}${r.rem ? ' + '+r.rem+' rem' : ''}</td><td>${r.fx}</td><td class="total">${r.total}</td></tr>
   `).join('');
 }
 
@@ -478,6 +542,151 @@ async function saveResetSettings(){
     catch (err) { console.error(err); }
   }
   renderUnitsTable();
+}
+
+// ===================================================================
+// UI: Remedial tab
+// ===================================================================
+async function saveRemStatus(cls, weekday, slot, active, teacher){
+  const key = remKey({class:cls, weekday, slot});
+  remCache[key] = { active, teacher: teacher || null };
+  if (db) {
+    try {
+      await db.collection('remStatus').doc(key.replace(/\|/g,'_')).set({
+        class: cls, weekday, slot, active, teacher: teacher || null
+      });
+    } catch (err) { console.error(err); }
+  }
+}
+
+function renderRemedialBoard(){
+  const board = document.getElementById('remedialBoard');
+  const pending = SCHOOL_DATA.PENDING_SLOTS || [];
+  if (pending.length === 0) {
+    board.innerHTML = '<div class="empty-note">No remedial (REM) slots found in the source timetable.</div>';
+    return;
+  }
+  const byClass = {};
+  pending.forEach(p => { (byClass[p.class] = byClass[p.class] || []).push(p); });
+
+  let html = '';
+  Object.keys(byClass).sort().forEach(cls => {
+    html += `<div class="rem-class-group"><div class="rem-class-label">${cls}</div>`;
+    byClass[cls].sort((a,b) => WEEKDAY_NAMES.indexOf(a.weekday) - WEEKDAY_NAMES.indexOf(b.weekday) || a.slot - b.slot)
+      .forEach(p => {
+        const tmpl = templateOf(p.class, p.weekday);
+        const tinfo = tmpl[p.slot - 1];
+        const time = (tinfo && tinfo.time) ? tinfo.time : 'time uncertain ⚠';
+        const key = remKey(p);
+        const r = remCache[key] || { active: false, teacher: '' };
+        html += `<div class="rem-row" data-key="${key}" data-class="${p.class}" data-weekday="${p.weekday}" data-slot="${p.slot}">
+          <span class="rr-time">${p.weekday} P${p.slot} · ${time}</span>
+          <input type="checkbox" class="rem-toggle" ${r.active ? 'checked' : ''}>
+          <input type="text" placeholder="Teacher once hired" value="${r.teacher || ''}">
+          <span class="rem-status ${r.active ? 'on' : ''}">${r.active && r.teacher ? 'ACTIVE — counts toward ' + r.teacher + "'s units" : 'off — not counted, not blocking anyone'}</span>
+          <button class="rem-save">SAVE</button>
+        </div>`;
+      });
+    html += `</div>`;
+  });
+  board.innerHTML = html;
+
+  board.querySelectorAll('.rem-row').forEach(row => {
+    row.querySelector('.rem-save').addEventListener('click', async () => {
+      const cls = row.dataset.class, weekday = row.dataset.weekday, slot = parseInt(row.dataset.slot, 10);
+      const active = row.querySelector('.rem-toggle').checked;
+      const teacher = row.querySelector('input[type=text]').value.trim();
+      await saveRemStatus(cls, weekday, slot, active, teacher);
+      renderRemedialBoard();
+      renderTimetable();
+      populateFxSlots();
+    });
+  });
+}
+
+// ===================================================================
+// UI: Temp Switch mode — swap two teachers' periods for N days
+// ===================================================================
+function populateSwitchTeacherSelects(){
+  const names = Object.keys(SCHOOL_DATA.TEACHER_SCHEDULE).sort();
+  const opts = names.map(t => `<option value="${t}">${t}</option>`).join('');
+  document.getElementById('swTeacherA').innerHTML = opts;
+  document.getElementById('swTeacherB').innerHTML = opts;
+}
+
+function populateSwitchSlotSelect(teacherSelectId, slotSelectId){
+  const teacher = document.getElementById(teacherSelectId).value;
+  const dateStr = document.getElementById('swDate').value || todayStr();
+  const weekday = weekdayNameOf(dateStr);
+  const sel = document.getElementById(slotSelectId);
+  if (!SCHOOL_DAYS.includes(weekday)) {
+    sel.innerHTML = '<option value="">No school that day</option>';
+    return;
+  }
+  const sched = SCHOOL_DATA.TEACHER_SCHEDULE[teacher];
+  const options = [];
+  for (let s=1; s<=8; s++){
+    const cell = sched[weekday][s-1];
+    if (cell && cell.type === 'class') {
+      const tmpl = templateOf(cell.class, weekday);
+      const t = tmpl[s-1];
+      options.push(`<option value="${s}|${cell.group||''}">${cell.class} P${s} (${t && t.time ? t.time : '?'})</option>`);
+    }
+  }
+  sel.innerHTML = options.length ? options.join('') : '<option value="">No periods that day</option>';
+}
+
+async function assignSwitch(){
+  const dateStr = document.getElementById('swDate').value || todayStr();
+  const weekday = weekdayNameOf(dateStr);
+  const days = Math.max(1, parseInt(document.getElementById('swDays').value, 10) || 1);
+  const endDate = addDays(dateStr, days - 1);
+  const teacherA = document.getElementById('swTeacherA').value;
+  const teacherB = document.getElementById('swTeacherB').value;
+  const [slotAStr, groupA] = (document.getElementById('swSlotA').value || '').split('|');
+  const [slotBStr, groupB] = (document.getElementById('swSlotB').value || '').split('|');
+  const msg = document.getElementById('swMsg');
+
+  if (!slotAStr || !slotBStr) { msg.textContent = 'Pick a period for both teachers.'; msg.className = 'fx-msg err'; return; }
+  if (teacherA === teacherB) { msg.textContent = 'Pick two different teachers.'; msg.className = 'fx-msg err'; return; }
+
+  const slotA = parseInt(slotAStr, 10), slotB = parseInt(slotBStr, 10);
+  const cellA = SCHOOL_DATA.TEACHER_SCHEDULE[teacherA][weekday][slotA-1];
+  const cellB = SCHOOL_DATA.TEACHER_SCHEDULE[teacherB][weekday][slotB-1];
+  const switchId = 'sw-' + Date.now();
+
+  try {
+    await saveFixtureDoc({
+      class: cellA.class, weekday, slot: slotA, group: groupA || null,
+      originalTeacher: teacherA, subTeacher: teacherB,
+      startDate: dateStr, days, endDate, switchId, createdAt: Date.now()
+    });
+    await saveFixtureDoc({
+      class: cellB.class, weekday, slot: slotB, group: groupB || null,
+      originalTeacher: teacherB, subTeacher: teacherA,
+      startDate: dateStr, days, endDate, switchId, createdAt: Date.now()
+    });
+    msg.textContent = `Switched: ${teacherB} now covers ${cellA.class} P${slotA}, ${teacherA} now covers ${cellB.class} P${slotB}, ${dateStr} → ${endDate}.`;
+    msg.className = 'fx-msg ok';
+    renderFixtureList(); renderTimetable();
+  } catch (err) {
+    console.error(err);
+    msg.textContent = 'Could not save the switch — check your Firebase config / rules.';
+    msg.className = 'fx-msg err';
+  }
+}
+
+async function removeSwitch(switchId){
+  const toRemove = fixturesCache.filter(f => f.switchId === switchId);
+  fixturesCache = fixturesCache.filter(f => f.switchId !== switchId);
+  renderFixtureList(); renderTimetable(); populateFxSlots();
+  if (db) {
+    for (const f of toRemove) {
+      if (!f.id.startsWith('local-')) {
+        try { await db.collection('fixtures').doc(f.id).delete(); } catch (err) { console.error(err); }
+      }
+    }
+  }
 }
 
 // ===================================================================
@@ -493,23 +702,37 @@ async function loadSettingsFromFirestore(){
   const doc = await db.collection('config').doc('settings').get();
   if (doc.exists) settingsCache = { ...settingsCache, ...doc.data() };
 }
+async function loadRemFromFirestore(){
+  if (!db) return;
+  const snap = await db.collection('remStatus').get();
+  remCache = {};
+  snap.docs.forEach(d => {
+    const data = d.data();
+    remCache[remKey({class:data.class, weekday:data.weekday, slot:data.slot})] = { active: data.active, teacher: data.teacher };
+  });
+}
 
 async function boot(){
   document.getElementById('todayChip').textContent = todayStr();
   document.getElementById('viewDate').value = todayStr();
   document.getElementById('fxDate').value = todayStr();
   document.getElementById('absDate').value = todayStr();
+  document.getElementById('swDate').value = todayStr();
 
   initFirebase();
   await loadSettingsFromFirestore();
   await loadFixturesFromFirestore();
+  await loadRemFromFirestore();
 
   populateClassSelects();
   populateAbsTeacherSelect();
+  populateSwitchTeacherSelects();
   setupModeToggle();
   renderTimetable();
   populateFxSlots();
   renderAbsenceBoard();
+  populateSwitchSlotSelect('swTeacherA', 'swSlotA');
+  populateSwitchSlotSelect('swTeacherB', 'swSlotB');
 
   document.getElementById('classSelect').addEventListener('change', renderTimetable);
   document.getElementById('viewDate').addEventListener('change', renderTimetable);
@@ -523,6 +746,14 @@ async function boot(){
   document.getElementById('absTeacher').addEventListener('change', renderAbsenceBoard);
   document.getElementById('absDate').addEventListener('change', renderAbsenceBoard);
   document.getElementById('absDays').addEventListener('change', renderAbsenceBoard);
+
+  document.getElementById('swDate').addEventListener('change', () => {
+    populateSwitchSlotSelect('swTeacherA', 'swSlotA');
+    populateSwitchSlotSelect('swTeacherB', 'swSlotB');
+  });
+  document.getElementById('swTeacherA').addEventListener('change', () => populateSwitchSlotSelect('swTeacherA', 'swSlotA'));
+  document.getElementById('swTeacherB').addEventListener('change', () => populateSwitchSlotSelect('swTeacherB', 'swSlotB'));
+  document.getElementById('swAssignBtn').addEventListener('click', assignSwitch);
 }
 
 boot();

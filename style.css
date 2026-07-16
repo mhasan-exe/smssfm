@@ -169,6 +169,38 @@ select:focus, input:focus{ outline:3px solid var(--lime); outline-offset:1px; }
   margin:16px 0 6px;
 }
 
+/* ---------------- remedial tab ---------------- */
+.rem-class-group{ margin-bottom:20px; }
+.rem-class-label{
+  font-family:var(--font-display); font-size:15px; color:var(--lime);
+  margin:0 0 8px;
+}
+.rem-row{
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+  font-family:var(--font-mono); font-size:12.5px;
+  background:var(--panel); border:2px solid #000; box-shadow:var(--shadow-sm);
+  padding:11px 14px; margin-bottom:8px;
+}
+.rem-row .rr-time{ color:var(--ink-dim); min-width:170px; }
+.rem-toggle{
+  appearance:none; width:44px; height:24px; background:#000; border:2px solid var(--lime-dim);
+  position:relative; cursor:pointer; flex-shrink:0;
+}
+.rem-toggle:checked{ background:var(--lime); }
+.rem-toggle::after{
+  content:''; position:absolute; top:2px; left:2px; width:16px; height:16px;
+  background:var(--ink); transition:transform .1s ease;
+}
+.rem-toggle:checked::after{ background:#000; transform:translateX(20px); }
+.rem-row input[type=text]{ min-width:180px; }
+.rem-row .rem-status{ font-size:11px; color:var(--ink-dim); }
+.rem-row .rem-status.on{ color:var(--lime); font-weight:700; }
+.rem-row button.rem-save{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  background:var(--lime); color:#000; border:2px solid #000; padding:6px 10px; cursor:pointer;
+}
+.rem-row button.rem-save:hover{ background:var(--lime-dim); }
+
 /* ---------------- timetable grid ---------------- */
 .grid-wrap{ overflow-x:auto; border:var(--bw) solid var(--border); box-shadow:var(--shadow); background:var(--panel);}
 table.tt{ border-collapse:collapse; width:100%; min-width:760px; }

@@ -26,6 +26,11 @@ service cloud.firestore {
       allow write: if request.resource.data.keys().hasAll(['resetDay','resetTime']);
     }
 
+    match /remStatus/{slotId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasAll(['class','weekday','slot','active']);
+    }
+
     // Everything else is closed.
     match /{document=**} {
       allow read, write: if false;

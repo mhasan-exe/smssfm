@@ -20,6 +20,7 @@
     <button class="tab-btn active" data-tab="timetables">TIMETABLES</button>
     <button class="tab-btn" data-tab="fixture">SET FIXTURE</button>
     <button class="tab-btn" data-tab="units">WEEKLY UNITS</button>
+    <button class="tab-btn" data-tab="remedial">REMEDIAL</button>
   </nav>
   <div class="date-chip" id="todayChip">—</div>
 </header>
@@ -54,6 +55,7 @@
     <div class="mode-toggle">
       <button class="mode-btn active" data-mode="absent">MARK TEACHER ABSENT (all periods)</button>
       <button class="mode-btn" data-mode="single">COVER ONE PERIOD</button>
+      <button class="mode-btn" data-mode="switch">TEMP SWITCH (swap two teachers)</button>
     </div>
 
     <!-- ---- Mode: mark teacher absent, auto-list every affected period ---- -->
@@ -106,6 +108,37 @@
       <div class="fx-msg" id="fxMsg"></div>
     </div>
 
+    <!-- ---- Mode: temporary switch between two teachers' periods ---- -->
+    <div class="fixture-form hidden" id="mode-switch">
+      <p class="hint" style="margin:0 0 4px;">Pick one period from each teacher — they'll trade for the duration you set, then both revert automatically (or undo any time).</p>
+      <label class="field">
+        <span>Start date</span>
+        <input type="date" id="swDate">
+      </label>
+      <label class="field">
+        <span>Number of days</span>
+        <input type="number" id="swDays" min="1" value="1">
+      </label>
+      <label class="field">
+        <span>Teacher A</span>
+        <select id="swTeacherA"></select>
+      </label>
+      <label class="field">
+        <span>Teacher A's period (on that weekday)</span>
+        <select id="swSlotA"></select>
+      </label>
+      <label class="field">
+        <span>Teacher B</span>
+        <select id="swTeacherB"></select>
+      </label>
+      <label class="field">
+        <span>Teacher B's period (on that weekday)</span>
+        <select id="swSlotB"></select>
+      </label>
+      <button class="btn-lime" id="swAssignBtn">SWITCH THEM</button>
+      <div class="fx-msg" id="swMsg"></div>
+    </div>
+
     <h2 class="sub-head">Active &amp; Upcoming Fixtures</h2>
     <div id="fixtureList" class="fixture-list"></div>
   </section>
@@ -133,6 +166,14 @@
       <thead><tr><th>#</th><th>Teacher</th><th>Default</th><th>Fixture units (this week)</th><th>Total</th></tr></thead>
       <tbody id="unitsBody"></tbody>
     </table>
+  </section>
+  <!-- ===================== REMEDIAL TAB ===================== -->
+  <section class="panel hidden" id="tab-remedial">
+    <div class="panel-head">
+      <h1>Remedial Periods</h1>
+      <p class="hint">These periods showed up as "REM" on the master timetable — remedial slots for grade 7 (Maths/Sci/Eng) with no teacher hired yet. Each one stays switched off (not counted, doesn't block anyone) until you flip it on and assign whoever's been hired.</p>
+    </div>
+    <div id="remedialBoard"></div>
   </section>
 
 </main>

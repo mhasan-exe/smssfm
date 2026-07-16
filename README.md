@@ -1,101 +1,116 @@
 # AKESP — Timetable & Fixture Board
 
 Plain HTML/CSS/JS static site. No build step, no framework. Firebase (Firestore)
-is used only to store fixture (substitute) assignments and one settings doc —
-everything else is baked into `data.js` from your real timetable spreadsheet.
+stores only: fixture/switch records, one settings doc, and remedial-slot
+toggles. Everything else is baked into `data.js` from the real timetable
+spreadsheet.
 
 ## Files
 
-- `index.html` — the whole app shell (3 tabs: Timetables / Set Fixture / Weekly Units)
+- `index.html` — the whole app shell (4 tabs: Timetables / Set Fixture / Weekly Units / Remedial)
 - `style.css` — neobrutalist styling, deep coal + electric lime
-- `app.js` — all logic (rendering, fixture assignment, units calculation)
-- `data.js` — **auto-generated** from `Teachers_timetable.xlsx`. Don't hand-edit; regenerate if the timetable changes.
-- `firebase-config.js` — **you need to fill this in** with your project's web SDK config (Firebase Console → Project settings → Your apps)
-- `firestore.rules` — open read/write on `fixtures` and `config/settings` only (per your choice — no login). Deploy with `firebase deploy --only firestore:rules`, or paste into the Firestore Rules tab in console.
+- `app.js` — all logic (rendering, fixtures, switches, remedial slots, units)
+- `data.js` — **auto-generated** from `Working_Timetables_2026_-_27_-_Copy.xlsx`. Don't hand-edit; regenerate if the timetable changes.
+- `firebase-config.js` — **fill this in** with your project's web SDK config (Firebase Console → Project settings → Your apps)
+- `firestore.rules` — open read/write on `fixtures`, `config/settings`, and `remStatus` only (per your choice — no login).
 
 ## Deploying
 
-1. Fill in `firebase-config.js` with your `akespsfm` project's web config (or a new project, your call).
-2. In Firebase Console, enable Firestore (Native mode).
+1. Fill in `firebase-config.js`.
+2. Enable Firestore (Native mode) in Firebase Console.
 3. Paste `firestore.rules` into the Rules tab and publish.
-4. Push this folder to a GitHub repo, enable GitHub Pages on it (Settings → Pages → deploy from branch), done. No backend to host.
+4. Push this folder to GitHub, enable Pages. Done — no backend to host.
 
-Until step 1 is done, the site still works in your browser for building/demoing —
-fixture assignments just live in memory and vanish on refresh instead of saving.
+Until step 1, the site still works for building/demoing — everything just
+lives in memory and resets on refresh instead of persisting.
 
-## How it works
+## Data source — rebuilt from the new workbook
 
-- **Timetables tab**: pick a class, see its whole week. Pick a date to preview
-  what that week actually looks like on that day (shows substitutes if a
-  fixture is active).
-- **Set Fixture tab**: two entry points into the same underlying system:
-  - **Mark teacher absent** (default view): pick the teacher, first absent
-    date, and how many days they're out. AKESP pulls every period that
-    teacher normally teaches within that window — any class, any grade — and
-    lists them one by one with a "who's free right now, lightest load first"
-    dropdown next to each. Assign as you go; a progress line shows
-    "x / y periods covered."
-  - **Cover one period**: the direct single-period flow — pick date, class,
-    and period yourself if you already know exactly what needs covering.
-  Both write to the same fixture records, so a period assigned one way shows
-  up correctly no matter which view you check it from. Each substitution
-  auto-expires on its own after the date it covers — nothing to manually revert.
-- **Weekly Units tab**: every teacher's default load (from their real
-  timetable) + fixture periods picked up so far this week. You can change
-  which day/time the week "resets" on — this shifts what counts as
-  "this week" for everyone, and doesn't require deleting or resetting any data.
+This version is rebuilt entirely from `Working_Timetables_2026_-_27_-_Copy.xlsx`,
+specifically:
+- **`Teachers Timetable`** (the consolidated, patched sheet) — the master
+  source for who teaches what, when. This superseded the old 4 separate
+  subject sheets from the first version.
+- **`Class 6` / `Class 7` / `Class 8` / `9 & 10`** — subject-only, class-centric
+  sheets, used to find every **REM** (remedial, not-yet-hired) slot.
+- **`Allotment`** — official per-teacher workload figures, used as a
+  cross-check (see below).
 
-## Assumptions I made — please sanity-check these against how the school actually runs
+Your fixes came through cleanly:
+- **8EE / Thursday** — now lands on P4, no longer landing on Shazia's break column.
+- **Irsa / "combined with Nizar"** — that was an artifact of the old parser
+  merging two different source sheets; rebuilding from the single patched
+  master sheet, there's no such combination anywhere in the data.
+- **Grade 6 "duplicate last unit"** — confirmed: the source sheet's own
+  header row literally labels two different columns "6" with the identical
+  time range, and the class-only `Class 6` sheet confirms grade 6 has exactly
+  6 real periods a day, not 7. That phantom 7th slot is now dropped
+  everywhere (never counted as a unit, never shown as a period).
 
-1. **Default weekly units** = the number of periods a teacher is scheduled to
-   teach in a normal week, counted straight from `Teachers_timetable.xlsx`.
-   This is *not* stored anywhere — it's recalculated from the data every time,
-   so it can never go stale the way it did in the old app.
+**One remaining ambiguous cell**, flagged with ⚠ in the UI rather than
+guessed at: **Arfa (Eng) — 8EE — Friday, slot 5**. Her Friday row mixes
+grade 6 and grade 8 classes across the same columns, same shape as the old
+Shazia issue — 1 cell out of 749 scheduled periods.
 
-2. **"REM" periods** (8 of them in the sheet) are treated as the teacher being
-   busy/unavailable, but **not** counted toward their weekly unit total, since
-   they're not an actual class. If REM should count as a unit, it's a
-   one-line change in `build_data.py`.
+**Workload cross-check**: comparing computed units (actual periods in the
+patched `Teachers Timetable`) against `Allotment`'s official "WORK LOAD"
+column, 15 of 43 teachers match exactly; 18 differ (up to 6 units), and the
+rest have no clean name match between sheets. The app uses the **computed**
+figure (what's actually on the patched schedule) since that's what genuinely
+needs covering — but the gap is worth a look in case some periods haven't
+been entered yet for teachers below their target load.
 
-3. **One-off tags** like `(AH)`, `(Sal)`, `(L)`, `(Z)`, `(N)`, `(SHM)`, `(SHN)`
-   next to a handful of grade 6/7 periods — I don't have a name key for these
-   initials, so they're kept as a small note on that period only and don't
-   affect free-teacher matching. If these represent a second teacher who's
-   also genuinely busy then, let me know who they map to and I'll fold them in.
+## REM (remedial) slots — Remedial tab
 
-4. **Cross-grade period matching**: Grade 6, Grade 7, and Grade 8–10 have
-   slightly different break placements (up to ~25 minutes apart around the
-   same "period number"). Free-teacher lookups match by period-slot position,
-   which is exact everywhere except right around each band's break — that's
-   the one part of this I'd actually like you to double check against the
-   real bell timing before relying on it for back-to-back grade-6/grade-9
-   coverage decisions.
+20 periods across grade 7 (Maths/Sci/Eng) are marked REM in the source —
+remedial classes with no teacher hired yet, starting in about a month. Each
+one is **off by default**: not counted toward anyone's load, doesn't block
+any substitute search. Once a hire starts, go to the Remedial tab, flip that
+slot on, type their name, save — from then on it behaves exactly like a real
+period (counts toward their units, blocks them from being pulled as a
+substitute then, shows up on the class's timetable). Flip it back off any
+time — nothing is destructive, no data is lost by toggling.
 
-   One specific cell in the source spreadsheet falls squarely in that
-   ambiguous zone: **Shazia (Sindhi/Isl) — 8EE — Thursday, period slot 6**.
-   Her row mixes grade 6/7 and grade 8 classes across the same columns, and
-   this particular class lands on a column her other grade-8 classes treat
-   as break. The app still shows it (nothing is ever silently dropped — it's
-   flagged with a ⚠ and a tooltip) but the displayed time for that one cell
-   may be off by up to ~25 minutes. Everything else — all 809 other
-   scheduled periods across the whole week — resolved cleanly with no
-   ambiguity.
+## Set Fixture — three ways in, one system underneath
 
-5. **Grade 9 Urdu/Islamiat split groups** (e.g. "9EA" splits into a U group
-   and an I group taught simultaneously by two different teachers) are
-   handled as two separate bookings at the same period — both show up, both
-   block their respective teacher, no conflict.
+- **Mark teacher absent**: teacher + start date + days out → lists every
+  period they're actually scheduled for in that window, any class, any
+  grade, with a free-teacher dropdown next to each.
+- **Cover one period**: direct — pick date, class, period yourself.
+- **Temp switch**: pick one period from each of two teachers on the same
+  date — they trade for the duration you set (or undo any time), useful for
+  logistics swaps that aren't about anyone being absent.
 
-6. **Fixture write access is open** (no login) — anyone with the site link
-   can set or remove fixtures, per your choice. If that turns out to be a
-   problem in practice, adding a shared password gate or Firebase login later
-   is a small, isolated change.
+All three write the same underlying fixture records, so the Timetables and
+Weekly Units tabs don't care which mode created a substitution.
+
+**Free-teacher sorting**: teachers who already teach that exact class
+(marked ★) are listed before anyone else, then sorted lightest-load-first
+within each group — someone who already knows the class and its students
+beats a random light-load teacher who's never met them.
+
+## Weekly Units tab
+
+Default load + active remedial units + fixture periods picked up this week,
+recalculated live every time — never a stored counter that can drift.
+Change which day/time the week "resets" on any time; nothing needs
+resetting or deleting when you do.
+
+## Library periods
+
+The source sheet marks a class taken to the library with a trailing `lib` on
+that cell, directly under whichever teacher's row it appears in — so it's
+now handled as a plain note ("Library") on that teacher's own period, no
+separate name-decoding needed. (The earlier version had one-letter tags like
+`(AH)`/`(SHM)` scattered across the old per-subject sheets that needed a
+decoder ring; the new consolidated master sheet doesn't use that convention,
+so it's moot now.)
 
 ## Regenerating `data.js` from a new spreadsheet
 
-`build-scripts/parse_timetable.py` reads `Teachers_timetable.xlsx` into a raw
-JSON dump; `build-scripts/build_data.py` turns that into the normalized
-structure `data.js` is generated from. Both need `openpyxl` (`pip install
-openpyxl`). Point them at a new spreadsheet and re-run both, in order, any
-time the timetable changes — no need to come back to me unless the sheet
-layout itself changes shape.
+`build-scripts/parse_timetable_v2.py` reads the `Teachers Timetable` sheet
+into a raw JSON dump; `build-scripts/build_data_v2.py` turns that — plus the
+`Class 6/7/8/9&10` sheets for REM slots and `Allotment` for the workload
+cross-check — into the structure `data.js` is generated from. Both need
+`openpyxl` (`pip install openpyxl`). Re-run both, in order, any time the
+timetable changes.

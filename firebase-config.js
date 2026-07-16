@@ -5,11 +5,10 @@
 // and click through everything before wiring up the real project.
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCsenW9L3RJ_fiWahZ0LVqvnX157T2-qGA",
-  authDomain: "layla-16611.firebaseapp.com",
-  projectId: "layla-16611",
-  storageBucket: "layla-16611.firebasestorage.app",
-  messagingSenderId: "836023307424",
-  appId: "1:836023307424:web:cd916166fb69c1502ccdc5",
-  measurementId: "G-L068KXBVR8"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
