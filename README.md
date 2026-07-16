@@ -24,6 +24,39 @@ spreadsheet.
 Until step 1, the site still works for building/demoing — everything just
 lives in memory and resets on refresh instead of persisting.
 
+## Why some classes were showing as "free" that shouldn't have been
+
+Found it: **5 teachers were completely missing from the `Teachers Timetable`
+master sheet** — they existed in the old per-subject sheets (still sitting in
+this same workbook) but never got carried over when the master sheet was
+built. That's what caused extra "free" periods to show up, and it's also
+what caused the old "Irsa combined with Nizar" glitch — Nizar wasn't in the
+master sheet at all.
+
+**Recovered automatically (safe, no conflicts):**
+- **Kiran-Urdu** — fully missing, zero overlap with anyone else's schedule — added back in whole.
+- **"Maths NT"** → renamed to **Nizar** — matched his old schedule slot-for-slot, 18/18, exactly. He wasn't missing, just relabeled generically.
+- **"SST - NT"** → renamed to **Saleem - NT** — matched 18/18 for what the placeholder had, plus 10 more of his old periods that nobody else in the master sheet claims were restored too.
+
+**Flagged instead of guessed** — these need your call, not mine:
+- **Aliya-Chemistry** — her old periods are now split inconsistently across
+  three different current teachers (Chemistry NT, Shahreyar-ICT, Nabila-Sci).
+  Looks like she's left and her load got redistributed — I didn't add her
+  back as a separate person since that would double-book those slots. If
+  she's still teaching, let me know which of those three she actually is (or
+  if it's someone else entirely).
+- **"Shamim - (SST)"** vs the old **"Shahmim- (SST)"** — 17 of 18 periods
+  line up, but 5 don't cleanly match (mostly Thursday). Left the master
+  sheet's version as-is rather than force a guess on the mismatched ones.
+- **One specific slot dropped on purpose**: Saleem's old Thursday-slot-4
+  library duty for 6EE directly conflicts with Lib-Zeeshan's existing 6EE
+  booking at that exact time — looked like stale/superseded data, so it's
+  left out rather than double-booking that period.
+
+Total recovered: 27 real periods that were incorrectly showing as "free."
+If any of the flagged items above should go a different way, it's a
+one-line change in `build-scripts/patch_missing_teachers.py`.
+
 ## Data source — rebuilt from the new workbook
 
 This version is rebuilt entirely from `Working_Timetables_2026_-_27_-_Copy.xlsx`,
@@ -50,15 +83,15 @@ Your fixes came through cleanly:
 **One remaining ambiguous cell**, flagged with ⚠ in the UI rather than
 guessed at: **Arfa (Eng) — 8EE — Friday, slot 5**. Her Friday row mixes
 grade 6 and grade 8 classes across the same columns, same shape as the old
-Shazia issue — 1 cell out of 749 scheduled periods.
+Shazia issue — 1 cell out of 776 scheduled periods.
 
-**Workload cross-check**: comparing computed units (actual periods in the
-patched `Teachers Timetable`) against `Allotment`'s official "WORK LOAD"
-column, 15 of 43 teachers match exactly; 18 differ (up to 6 units), and the
-rest have no clean name match between sheets. The app uses the **computed**
-figure (what's actually on the patched schedule) since that's what genuinely
-needs covering — but the gap is worth a look in case some periods haven't
-been entered yet for teachers below their target load.
+**Workload cross-check**: comparing computed units (actual periods, after
+recovering the 5 missing teachers above) against `Allotment`'s official
+"WORK LOAD" column: 15 of 35 name-matched teachers line up exactly; 20
+differ. The app uses the **computed** figure (what's actually on the patched
+schedule) since that's what genuinely needs covering — the remaining gaps
+are worth a look in case a few more periods still haven't made it into the
+master sheet for those specific teachers.
 
 ## REM (remedial) slots — Remedial tab
 
@@ -108,9 +141,18 @@ so it's moot now.)
 
 ## Regenerating `data.js` from a new spreadsheet
 
-`build-scripts/parse_timetable_v2.py` reads the `Teachers Timetable` sheet
-into a raw JSON dump; `build-scripts/build_data_v2.py` turns that — plus the
-`Class 6/7/8/9&10` sheets for REM slots and `Allotment` for the workload
-cross-check — into the structure `data.js` is generated from. Both need
-`openpyxl` (`pip install openpyxl`). Re-run both, in order, any time the
-timetable changes.
+Three steps, in order, each needs `openpyxl` (`pip install openpyxl`):
+
+```
+python3 build-scripts/parse_timetable_v2.py <file.xlsx>
+python3 build-scripts/recover_missing_teachers.py <file.xlsx>
+python3 build-scripts/build_data_v2.py <file.xlsx>
+```
+
+The middle step is the one that catches teachers who exist in old
+per-subject sheets but didn't make it into the consolidated master sheet —
+worth keeping even after this round, since it's cheap insurance against the
+exact "why are there more free periods now" issue this round turned up. Its
+specific hard-coded fixes (Kiran/Nizar/Saleem) are dated to this workbook —
+re-check its docstring if you run it against a meaningfully different sheet
+layout later.

@@ -1,4 +1,4 @@
-// Auto-generated from Working_Timetables_2026_-_27_-_Copy.xlsx (Teachers Timetable + Class sheets + Allotment) — do not hand-edit.
+// Auto-generated from Working_Timetables_2026_-_27_-_Copy.xlsx (Teachers Timetable + 5 recovered teachers + Class sheets + Allotment) — do not hand-edit.
 const SCHOOL_DATA = {
  "PERIOD_TEMPLATES": {
   "G8-10_MonThu": [
@@ -3289,148 +3289,6 @@ const SCHOOL_DATA = {
     null
    ]
   },
-  "SST - NT": {
-   "Monday": [
-    {
-     "type": "class",
-     "class": "7EE",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    {
-     "type": "class",
-     "class": "6EB",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6EC",
-     "group": null,
-     "note": null
-    },
-    null
-   ],
-   "Tuesday": [
-    {
-     "type": "class",
-     "class": "7EC",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "7ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    {
-     "type": "class",
-     "class": "6EC",
-     "group": null,
-     "note": null
-    },
-    null,
-    null
-   ],
-   "Wednesday": [
-    {
-     "type": "class",
-     "class": "7EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    {
-     "type": "class",
-     "class": "6EA",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    null
-   ],
-   "Thursday": [
-    null,
-    {
-     "type": "class",
-     "class": "6EB",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "7EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "7EE",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "6EA",
-     "group": null,
-     "note": null
-    },
-    null
-   ],
-   "Friday": [
-    null,
-    {
-     "type": "class",
-     "class": "6EB",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "6EC",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6EA",
-     "group": null,
-     "note": null
-    },
-    null,
-    null
-   ]
-  },
   "Jawaid - Eng": {
    "Monday": [
     {
@@ -5262,148 +5120,6 @@ const SCHOOL_DATA = {
     null
    ]
   },
-  "Maths NT": {
-   "Monday": [
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    null,
-    null
-   ],
-   "Tuesday": [
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    },
-    null
-   ],
-   "Wednesday": [
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null
-   ],
-   "Thursday": [
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    }
-   ],
-   "Friday": [
-    null,
-    {
-     "type": "class",
-     "class": "6ED",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "8EE",
-     "group": null,
-     "note": null
-    },
-    null,
-    null,
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    {
-     "type": "class",
-     "class": "6EE",
-     "group": null,
-     "note": null
-    },
-    null
-   ]
-  },
   "Shahreyar - ICT": {
    "Monday": [
     {
@@ -6188,6 +5904,477 @@ const SCHOOL_DATA = {
     {
      "type": "class",
      "class": "8EB",
+     "group": null,
+     "note": null
+    },
+    null
+   ]
+  },
+  "Kiran-Urdu": {
+   "Monday": [
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "7EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    }
+   ],
+   "Tuesday": [
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "7EA",
+     "group": null,
+     "note": null
+    }
+   ],
+   "Wednesday": [
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "Thursday": [
+    null,
+    {
+     "type": "class",
+     "class": "7EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    null
+   ],
+   "Friday": [
+    {
+     "type": "class",
+     "class": "7EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    null
+   ]
+  },
+  "Nizar": {
+   "Monday": [
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    null,
+    null
+   ],
+   "Tuesday": [
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    },
+    null
+   ],
+   "Wednesday": [
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null
+   ],
+   "Thursday": [
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    }
+   ],
+   "Friday": [
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EE",
+     "group": null,
+     "note": null
+    },
+    null
+   ]
+  },
+  "Saleem - NT": {
+   "Monday": [
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "10ED",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    null
+   ],
+   "Tuesday": [
+    {
+     "type": "class",
+     "class": "7EC",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "7ED",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "10EB",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    }
+   ],
+   "Wednesday": [
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "10EB",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "6ED",
+     "group": null,
+     "note": null
+    },
+    null,
+    {
+     "type": "class",
+     "class": "10EC",
+     "group": null,
+     "note": null
+    }
+   ],
+   "Thursday": [
+    null,
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "7EE",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    null
+   ],
+   "Friday": [
+    {
+     "type": "class",
+     "class": "10EB",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EB",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "6EC",
+     "group": null,
+     "note": null
+    },
+    null,
+    null,
+    {
+     "type": "class",
+     "class": "6EA",
+     "group": null,
+     "note": null
+    },
+    {
+     "type": "class",
+     "class": "8EE",
      "group": null,
      "note": null
     },
@@ -6288,10 +6475,6 @@ const SCHOOL_DATA = {
    "defaultUnits": 20,
    "officialWorkload": 20
   },
-  "SST - NT": {
-   "defaultUnits": 18,
-   "officialWorkload": null
-  },
   "Jawaid - Eng": {
    "defaultUnits": 20,
    "officialWorkload": 20
@@ -6344,10 +6527,6 @@ const SCHOOL_DATA = {
    "defaultUnits": 18,
    "officialWorkload": 20
   },
-  "Maths NT": {
-   "defaultUnits": 18,
-   "officialWorkload": null
-  },
   "Shahreyar - ICT": {
    "defaultUnits": 22,
    "officialWorkload": null
@@ -6367,6 +6546,18 @@ const SCHOOL_DATA = {
   "Awais - Urdu": {
    "defaultUnits": 22,
    "officialWorkload": 20
+  },
+  "Kiran-Urdu": {
+   "defaultUnits": 20,
+   "officialWorkload": 18
+  },
+  "Nizar": {
+   "defaultUnits": 18,
+   "officialWorkload": 3
+  },
+  "Saleem - NT": {
+   "defaultUnits": 25,
+   "officialWorkload": null
   }
  },
  "CLASS_SCHEDULE": {
@@ -6387,6 +6578,12 @@ const SCHOOL_DATA = {
     {
      "slot": 3,
      "teacher": "Irsa (Bio/Science)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 4,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -6431,6 +6628,12 @@ const SCHOOL_DATA = {
     {
      "slot": 7,
      "teacher": "Uzair( Islamiat)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 8,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     }
@@ -6487,6 +6690,12 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 2,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 3,
      "teacher": "Shahreyar - ICT",
      "group": null,
@@ -6506,6 +6715,12 @@ const SCHOOL_DATA = {
     }
    ],
    "Friday": [
+    {
+     "slot": 1,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
     {
      "slot": 2,
      "teacher": "Zareen - Maths",
@@ -6766,7 +6981,7 @@ const SCHOOL_DATA = {
    "Tuesday": [
     {
      "slot": 1,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -6943,13 +7158,25 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 6,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 7,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     }
    ],
    "Tuesday": [
+    {
+     "slot": 1,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
     {
      "slot": 2,
      "teacher": "Imtiaz (Eng)",
@@ -6970,7 +7197,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -6985,6 +7212,12 @@ const SCHOOL_DATA = {
     {
      "slot": 1,
      "teacher": "Yousra - Maths",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 2,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -7037,6 +7270,12 @@ const SCHOOL_DATA = {
      "teacher": "Nabila - Sci",
      "group": null,
      "note": null
+    },
+    {
+     "slot": 7,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
     }
    ],
    "Friday": [
@@ -7054,7 +7293,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 3,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7099,8 +7338,14 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 3,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 4,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7133,6 +7378,12 @@ const SCHOOL_DATA = {
     {
      "slot": 4,
      "teacher": "Arfa - Eng",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 6,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -7196,13 +7447,19 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
     {
      "slot": 3,
      "teacher": "Nabila - Sci",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 4,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -7228,13 +7485,19 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
     {
      "slot": 3,
      "teacher": "Nabila - Sci",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 5,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -7254,6 +7517,12 @@ const SCHOOL_DATA = {
   },
   "6EA": {
    "Monday": [
+    {
+     "slot": 1,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
     {
      "slot": 2,
      "teacher": "Arfa - Eng",
@@ -7293,6 +7562,12 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 4,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 6,
      "teacher": "Arfa - Eng",
      "group": null,
@@ -7301,6 +7576,12 @@ const SCHOOL_DATA = {
    ],
    "Wednesday": [
     {
+     "slot": 1,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 2,
      "teacher": "Shahreyar - ICT",
      "group": null,
@@ -7308,7 +7589,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 3,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7370,7 +7651,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 7,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     }
@@ -7389,6 +7670,12 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 3,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 5,
      "teacher": "Sana M - Isl",
      "group": null,
@@ -7396,7 +7683,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7450,7 +7737,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7628,7 +7915,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 4,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7672,7 +7959,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7710,7 +7997,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7724,7 +8011,7 @@ const SCHOOL_DATA = {
    "Thursday": [
     {
      "slot": 1,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7786,13 +8073,13 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
     {
      "slot": 7,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     }
@@ -7826,7 +8113,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 4,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7846,13 +8133,13 @@ const SCHOOL_DATA = {
    "Monday": [
     {
      "slot": 1,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
     {
      "slot": 2,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7890,19 +8177,19 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
     {
      "slot": 3,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
     {
      "slot": 4,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -7928,7 +8215,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7960,7 +8247,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -7978,7 +8265,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 6,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     }
@@ -7988,7 +8275,7 @@ const SCHOOL_DATA = {
    "Monday": [
     {
      "slot": 1,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -8015,6 +8302,12 @@ const SCHOOL_DATA = {
      "teacher": "Irsa (Bio/Science)",
      "group": null,
      "note": null
+    },
+    {
+     "slot": 8,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
     }
    ],
    "Tuesday": [
@@ -8031,6 +8324,12 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 3,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 4,
      "teacher": "Fida (Maths)",
      "group": null,
@@ -8041,18 +8340,30 @@ const SCHOOL_DATA = {
      "teacher": "Shazia (Sindhi / Isl)",
      "group": null,
      "note": null
+    },
+    {
+     "slot": 8,
+     "teacher": "Saleem - NT",
+     "group": null,
+     "note": null
     }
    ],
    "Wednesday": [
     {
      "slot": 1,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
     {
      "slot": 2,
      "teacher": "Irsa (Bio/Science)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 3,
+     "teacher": "Kiran-Urdu",
      "group": null,
      "note": null
     },
@@ -8099,6 +8410,12 @@ const SCHOOL_DATA = {
      "teacher": "Jawaid - Eng",
      "group": null,
      "note": null
+    },
+    {
+     "slot": 7,
+     "teacher": "Kiran-Urdu",
+     "group": null,
+     "note": null
     }
    ],
    "Thursday": [
@@ -8116,13 +8433,13 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 3,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
     {
      "slot": 6,
-     "teacher": "SST - NT",
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -8157,6 +8474,12 @@ const SCHOOL_DATA = {
     {
      "slot": 3,
      "teacher": "Shanaz (SST/PST)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 3,
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -9053,6 +9376,12 @@ const SCHOOL_DATA = {
      "teacher": "Shanaz (SST/PST)",
      "group": null,
      "note": null
+    },
+    {
+     "slot": 8,
+     "teacher": "Saleem - NT",
+     "group": null,
+     "note": null
     }
    ],
    "Friday": [
@@ -9507,6 +9836,12 @@ const SCHOOL_DATA = {
      "note": null
     },
     {
+     "slot": 7,
+     "teacher": "Saleem - NT",
+     "group": null,
+     "note": null
+    },
+    {
      "slot": 8,
      "teacher": "Ayesha (Bio)",
      "group": null,
@@ -9535,6 +9870,12 @@ const SCHOOL_DATA = {
     {
      "slot": 4,
      "teacher": "Nighat (AC) Eng",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 4,
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -9605,6 +9946,12 @@ const SCHOOL_DATA = {
     {
      "slot": 1,
      "teacher": "Shanaz (SST/PST)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 1,
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     },
@@ -9866,7 +10213,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 2,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -9934,7 +10281,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 7,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -9960,7 +10307,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 3,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -10004,7 +10351,7 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 3,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
@@ -10023,6 +10370,12 @@ const SCHOOL_DATA = {
     {
      "slot": 7,
      "teacher": "Shanaz (SST/PST)",
+     "group": null,
+     "note": null
+    },
+    {
+     "slot": 7,
+     "teacher": "Saleem - NT",
      "group": null,
      "note": null
     }
@@ -10060,13 +10413,13 @@ const SCHOOL_DATA = {
     },
     {
      "slot": 7,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     },
     {
      "slot": 8,
-     "teacher": "Maths NT",
+     "teacher": "Nizar",
      "group": null,
      "note": null
     }
